@@ -11,38 +11,38 @@ namespace BenneIO.GreenMobility.ApiClients
         {
         }
 
-        public async Task<ApiResponse> ChangePassword(Credential credential)
+        public async Task<ApiResponse> ChangePasswordAsync(Credential credential)
         {
             return await DoApiRequestAsync("changePassword", HttpMethod.Post, credential);
         }
 
-        public async Task<ApiResponse> ResetLostPassword(CredentialWithToken credentialWithToken)
+        public async Task<ApiResponse> ResetLostPasswordAsync(CredentialWithToken credentialWithToken)
         {
             return await DoApiRequestAsync("resetLostPassword", HttpMethod.Post, credentialWithToken);
         }
 
-        public async Task<ApiResponse> SendLostPasswordEmail(string email)
+        public async Task<ApiResponse> SendLostPasswordEmailAsync(string email)
         {
             return await DoApiRequestAsync("sendLostPasswordEmail", HttpMethod.Post, email);
         }
 
-        public async Task<ApiResponse<UserResult>> UpdateUser(UserData user)
+        public async Task<ApiResponse<UserResult>> UpdateUserAsync(UserData user)
         {
             return await DoApiRequestAsync<UserResult>("user", HttpMethod.Put, user);
         }
 
-        public async Task<ApiResponse> PostPromocode(ApplyPromocode promocode)
+        public async Task<ApiResponse> PostPromocodeAsync(ApplyPromocode promocode)
         {
             return await DoApiRequestAsync("promocodes", HttpMethod.Post, promocode);
         }
 
-        public async Task<ApiResponse> PostUserAgreement(int cityId)
+        public async Task<ApiResponse> PostUserAgreementAsync(int cityId)
         {
             return await DoApiRequestAsync("user/agreements", HttpMethod.Post, cityId);
         }
 
         // TODO: Resolve return type
-        public async Task<ApiResponse> GetCurrentJourney(bool includeKey, Position userPosition)
+        public async Task<ApiResponse> GetCurrentJourneyAsync(bool includeKey, Position userPosition)
         {
             Dictionary<string, string> headers = new Dictionary<string, string>
             {
@@ -52,7 +52,7 @@ namespace BenneIO.GreenMobility.ApiClients
             return await DoApiRequestAsync($"user/currentJourney?includeKey={includeKey.ToString().ToLower()}", headers: headers);
         }
 
-        public async Task<ApiResponse<LocatedVehicle>> GetCurrentJourneyVehicle(Position userPosition)
+        public async Task<ApiResponse<LocatedVehicle>> GetCurrentJourneyVehicleAsync(Position userPosition)
         {
             Dictionary<string, string> headers = new Dictionary<string, string>
             {
@@ -62,17 +62,17 @@ namespace BenneIO.GreenMobility.ApiClients
             return await DoApiRequestAsync<LocatedVehicle>("user/currentJourney/vehicle", headers: headers);
         }
 
-        public async Task<ApiResponse<UserResult>> GetUser()
+        public async Task<ApiResponse<UserResult>> GetUserAsync()
         {
             return await DoApiRequestAsync<UserResult>("user");
         }
 
-        public async Task<ApiResponse<UserResult>> PostUser(UserRegistration registration)
+        public async Task<ApiResponse<UserResult>> PostUserAsync(UserRegistration registration)
         {
             return await DoApiRequestAsync<UserResult>("user", HttpMethod.Post, registration);
         }
 
-        public async Task<ApiResponse<UserProfile>> GetUserProfile()
+        public async Task<ApiResponse<UserProfile>> GetUserProfileAsync()
         {
             return await DoApiRequestAsync<UserProfile>("user/profile");
         }

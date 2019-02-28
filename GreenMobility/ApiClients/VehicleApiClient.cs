@@ -22,18 +22,18 @@ namespace BenneIO.GreenMobility.ApiClients
             return await DoApiRequestAsync<IEnumerable<VehicleOption>>("options");
         }
 
-        public async Task<ApiResponse<VehicleDetails>> GetVehicle(string id)
+        public async Task<ApiResponse<VehicleDetails>> GetVehicleAsync(string id)
         {
             return await DoApiRequestAsync<VehicleDetails>($"vehicles/{id}");
         }
 
         // TODO: Resolve return type
-        public async Task<ApiResponse> PostJourney(string id)
+        public async Task<ApiResponse> PostJourneyAsync(string id)
         {
             return await DoApiRequestAsync($"vehicles/{id}/journey", HttpMethod.Post);
         }
 
-        public async Task<ApiResponse<IEnumerable<UploadItem>>> GetJourneyReports(string vehicleId, string journeyId, ReportDetails reportDetails)
+        public async Task<ApiResponse<IEnumerable<UploadItem>>> GetJourneyReportsAsync(string vehicleId, string journeyId, ReportDetails reportDetails)
         {
             return await DoApiRequestAsync<IEnumerable<UploadItem>>($"vehicles/{vehicleId}/journeys/{journeyId}/reports", HttpMethod.Post, reportDetails);
         }
