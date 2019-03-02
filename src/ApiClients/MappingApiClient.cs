@@ -1,4 +1,5 @@
 ﻿using BenneIO.GreenMobility.Models;
+using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
@@ -13,6 +14,9 @@ namespace BenneIO.GreenMobility.ApiClients
         // TODO: Resolve return type
         public async Task<ApiResponse<HomeZoneZone>> GetHomeZoneAsync(string id)
         {
+            if (id == null)
+                throw new ArgumentNullException(nameof(id));
+            
             return await DoApiRequestAsync<HomeZoneZone>($"mapping/homezones/{id}");
         }
 
@@ -25,6 +29,9 @@ namespace BenneIO.GreenMobility.ApiClients
         // TODO: Resolve return type
         public async Task<ApiResponse<LayerContent>> GetLayerAsync(string id)
         {
+            if (id == null)
+                throw new ArgumentNullException(nameof(id));
+
             return await DoApiRequestAsync<LayerContent>($"mapping/layers/{id}");
         }
 
