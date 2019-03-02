@@ -1,7 +1,6 @@
 ﻿using BenneIO.GreenMobility.ApiClients;
-using Newtonsoft.Json;
+using IdentityModel.Client;
 using System;
-using System.Collections.Generic;
 using System.Net.Http;
 using System.Threading.Tasks;
 
@@ -26,11 +25,11 @@ namespace BenneIO.GreenMobility
 
         public static async Task<GreenMobilityClient> LoginAsync()
         {
-            ApiResponse<Token> token = await DoAnonymousLoginAsync();
+            ApiResponse<string> token = await DoAnonymousLoginAsync();
             if (token.Result == null)
                 throw new GreenMobilityLoginException($"Failed to get anonymous token: {token.HttpResponse.ReasonPhrase}", token.HttpResponse);
 
-            return new GreenMobilityClient(token.Result.AccessToken);
+            return new GreenMobilityClient(token.Result);
         }
 
         public static async Task<GreenMobilityClient> LoginAsync(string userName, string password)
@@ -40,11 +39,11 @@ namespace BenneIO.GreenMobility
             if (password == null)
                 throw new ArgumentNullException(nameof(password));
 
-            ApiResponse<Token> token = await DoUserLoginAsync(userName, password);
+            ApiResponse<string> token = await DoUserLoginAsync(userName, password);
             if (token.Result == null)
                 throw new GreenMobilityLoginException($"Failed to get user token: {token.HttpResponse.ReasonPhrase}", token.HttpResponse);
 
-            return new GreenMobilityClient(token.Result.AccessToken);
+            return new GreenMobilityClient(token.Result);
         }
 
         public static GreenMobilityClient LoginAsync(string token)
@@ -55,73 +54,43 @@ namespace BenneIO.GreenMobility
             return new GreenMobilityClient(token);
         }
 
-        private static async Task<ApiResponse<Token>> DoAnonymousLoginAsync()
+        private static async Task<ApiResponse<string>> DoAnonymousLoginAsync()
         {
             using (HttpClient httpClient = new HttpClient())
             {
-                httpClient.BaseAddress = Constants.BaseUrl;
-                using (HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Post, "identity/core/connect/token"))
-                {
-                    Dictionary<string, string> fields = new Dictionary<string, string>
+                TokenResponse tokenResponse = await httpClient.RequestClientCredentialsTokenAsync(
+                    new ClientCredentialsTokenRequest
                     {
-                        { "scope", Constants.AnonymousScope },
-                        { "client_id", Constants.AnonymousClientId },
-                        { "client_secret", Constants.AnonymousClientSecret.ToString() },
-                        { "grant_type", Constants.AnonymousGrantType }
-                    };
+                        Address = "https://gm-dkcph-api.vulog.com/identity/core/connect/token",
+                        ClientId = "Basic",
+                        ClientSecret = "8714a848-02f0-4962-a3fb-69c723b6989a",
+                        Scope = "CarSharing"
+                    });
 
-                    request.Content = new FormUrlEncodedContent(fields);
-                    using (HttpResponseMessage response = await httpClient.SendAsync(request))
-                    {
-                        Token token = null;
-                        string content = await response.Content.ReadAsStringAsync();
-
-                        if (response.IsSuccessStatusCode)
-                        {
-                            token = JsonConvert.DeserializeObject<Token>(content);
-                        }
-
-                        return new ApiResponse<Token>(
-                            new ApiHttpResponse(response.StatusCode, response.ReasonPhrase, content),
-                            token);
-                    }
-                }
+                return new ApiResponse<string>(
+                        new ApiHttpResponse(tokenResponse.HttpStatusCode, tokenResponse.HttpErrorReason, tokenResponse.Raw),
+                        tokenResponse.AccessToken);
             }
         }
 
-        private static async Task<ApiResponse<Token>> DoUserLoginAsync(string userName, string password)
+        private static async Task<ApiResponse<string>> DoUserLoginAsync(string userName, string password)
         {
             using (HttpClient httpClient = new HttpClient())
             {
-                httpClient.BaseAddress = Constants.BaseUrl;
-                using (HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Post, "identity/core/connect/token"))
-                {
-                    Dictionary<string, string> fields = new Dictionary<string, string>
+                TokenResponse tokenResponse = await httpClient.RequestPasswordTokenAsync(
+                    new PasswordTokenRequest
                     {
-                        { "username", userName },
-                        { "password", password },
-                        { "scope", Constants.UserScope },
-                        { "client_id", Constants.UserClientId },
-                        { "client_secret", Constants.UserClientSecret.ToString() },
-                        { "grant_type", Constants.UserGrantType }
-                    };
+                        Address = "https://gm-dkcph-api.vulog.com/identity/core/connect/token",
+                        ClientId = "GM-DKCPH",
+                        ClientSecret = "a1bc2274-4558-40d1-bbc5-730af483cbd1",
+                        Scope = "CarSharing offline_access openid",
+                        UserName = userName,
+                        Password = password
+                    });
 
-                    request.Content = new FormUrlEncodedContent(fields);
-                    using (HttpResponseMessage response = await httpClient.SendAsync(request))
-                    {
-                        Token token = null;
-                        string content = await response.Content.ReadAsStringAsync();
-
-                        if (response.IsSuccessStatusCode)
-                        {
-                            token = JsonConvert.DeserializeObject<Token>(content);
-                        }
-
-                        return new ApiResponse<Token>(
-                            new ApiHttpResponse(response.StatusCode, response.ReasonPhrase, content),
-                            token);
-                    }
-                }
+                return new ApiResponse<string>(
+                        new ApiHttpResponse(tokenResponse.HttpStatusCode, tokenResponse.HttpErrorReason, tokenResponse.Raw),
+                        tokenResponse.AccessToken);
             }
         }
     }

@@ -1,5 +1,6 @@
 ﻿using Newtonsoft.Json;
 using Newtonsoft.Json.Serialization;
+using System;
 using System.Collections.Generic;
 using System.Net.Http;
 using System.Net.Http.Headers;
@@ -31,9 +32,9 @@ namespace BenneIO.GreenMobility.ApiClients
         {
             using (HttpClient httpClient = new HttpClient())
             {
-                httpClient.BaseAddress = Constants.BaseUrl;
-                httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", _bearerToken);
-
+                httpClient.BaseAddress = new Uri("https://gm-dkcph-api.vulog.com");
+                httpClient.SetBearerToken(_bearerToken);
+                
                 using (HttpRequestMessage request = new HttpRequestMessage(httpMethod ?? HttpMethod.Get, $"api/v3/{relativeUrl}"))
                 {
                     if (payload != null)
